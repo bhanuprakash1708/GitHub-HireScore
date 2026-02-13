@@ -89,10 +89,10 @@ export default function HomePage() {
 
             <Card className="border-white/20 bg-slate-900/90 text-slate-100 shadow-2xl shadow-slate-950/60">
               <CardHeader className="border-b border-white/20">
-                <CardTitle className="text-base font-semibold text-slate-100">
+                <CardTitle className="text-lg font-semibold text-slate-100">
                   Analyze your GitHub portfolio
                 </CardTitle>
-                <CardDescription className="text-xs text-slate-300">
+                <CardDescription className="text-sm text-slate-300">
                   We pull only public GitHub data and run a recruiter-style evaluation on
                   documentation, code structure, activity, impact, and organization.
                 </CardDescription>
@@ -100,7 +100,7 @@ export default function HomePage() {
               <CardContent className="pt-5">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-2">
-                    <label className="text-xs font-medium uppercase tracking-wide text-slate-100">
+                    <label className="text-sm font-medium uppercase tracking-wide text-slate-100">
                       GitHub profile URL or username
                     </label>
                     <Input
@@ -112,7 +112,7 @@ export default function HomePage() {
                     {error && (
                       <p className="text-xs font-medium text-rose-400">{error}</p>
                     )}
-                    <p className="text-[11px] text-slate-300">
+                    <p className="text-xs text-slate-300">
                       Tip: Start with your own username, then compare with senior engineers you
                       admire.
                     </p>
@@ -126,7 +126,7 @@ export default function HomePage() {
                     >
                       Run Portfolio Analysis
                     </Button>
-                    <p className="text-[11px] text-slate-300">
+                    <p className="text-xs text-slate-300">
                       No tokens from you. We use server-side GitHub + Gemini integrations.
                     </p>
                   </div>
@@ -134,38 +134,38 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <section className="grid gap-4 text-xs text-slate-300 sm:grid-cols-3">
-              <div className="rounded-xl border border-white/20 bg-slate-900/60 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            <section className="grid gap-4 text-sm text-slate-300 sm:grid-cols-3">
+              <div className="rounded-xl border border-white/20 bg-slate-900/60 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   For recruiters
                 </p>
-                <p className="mt-1.5 text-sm font-medium text-slate-50">
+                <p className="mt-2 text-base font-medium text-slate-50">
                   Portfolio at a glance
                 </p>
-                <p className="mt-1.5 text-[11px] text-slate-400">
+                <p className="mt-2 text-sm text-slate-400">
                   See how your GitHub would feel in a hiring pipeline, not just as raw stats.
                 </p>
               </div>
-              <div className="rounded-xl border border-white/20 bg-slate-900/60 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              <div className="rounded-xl border border-white/20 bg-slate-900/60 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   Scoring engine
                 </p>
-                <p className="mt-1.5 text-sm font-medium text-slate-50">
+                <p className="mt-2 text-base font-medium text-slate-50">
                   Transparent 0-100 score
                 </p>
-                <p className="mt-1.5 text-[11px] text-slate-400">
+                <p className="mt-2 text-sm text-slate-400">
                   Documentation, structure, activity, impact, and organization - each with its own
                   weight.
                 </p>
               </div>
-              <div className="rounded-xl border border-white/20 bg-slate-900/60 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              <div className="rounded-xl border border-white/20 bg-slate-900/60 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   AI assist
                 </p>
-                <p className="mt-1.5 text-sm font-medium text-slate-50">
+                <p className="mt-2 text-base font-medium text-slate-50">
                   Actionable next steps
                 </p>
-                <p className="mt-1.5 text-[11px] text-slate-400">
+                <p className="mt-2 text-sm text-slate-400">
                   Gemini turns your metrics into strengths, red flags, and a prioritized action
                   plan.
                 </p>
@@ -176,17 +176,17 @@ export default function HomePage() {
           <section className="flex flex-col gap-4">
             <Card className="border-white/20 bg-gradient-to-br from-slate-900/70 via-slate-900/40 to-sky-900/40 shadow-2xl shadow-slate-950/70">
               <CardHeader>
-                <CardTitle className="text-sm font-semibold text-slate-50">
+                <CardTitle className="text-base font-semibold text-slate-50">
                   What you&apos;ll see in your report
                 </CardTitle>
-                <CardDescription className="text-[11px] text-slate-400">
+                <CardDescription className="text-sm text-slate-400">
                   Designed to look and read like a recruiter&apos;s internal notes.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 text-xs text-slate-200">
+              <CardContent className="space-y-5 text-sm text-slate-200">
                 <ul className="space-y-2">
                   <li className="flex gap-2">
-                    <span className="mt-0.5 h-4 w-4 flex-shrink-0 rounded-full border border-slate-700 text-center text-[9px] leading-4">
+                    <span className="mt-0.5 h-5 w-5 flex-shrink-0 rounded-full border border-slate-700 text-center text-xs leading-5">
                       1
                     </span>
                     <span>
@@ -195,7 +195,7 @@ export default function HomePage() {
                     </span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="mt-0.5 h-4 w-4 flex-shrink-0 rounded-full border border-slate-700 text-center text-[9px] leading-4">
+                    <span className="mt-0.5 h-5 w-5 flex-shrink-0 rounded-full border border-slate-700 text-center text-xs leading-5">
                       2
                     </span>
                     <span>
@@ -204,7 +204,7 @@ export default function HomePage() {
                     </span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="mt-0.5 h-4 w-4 flex-shrink-0 rounded-full border border-slate-700 text-center text-[9px] leading-4">
+                    <span className="mt-0.5 h-5 w-5 flex-shrink-0 rounded-full border border-slate-700 text-center text-xs leading-5">
                       3
                     </span>
                     <span>
@@ -213,7 +213,7 @@ export default function HomePage() {
                     </span>
                   </li>
                 </ul>
-                <div className="mt-2 rounded-lg border border-white/20 bg-slate-900/60 px-3 py-2 text-[11px] text-slate-300">
+                <div className="mt-2 rounded-lg border border-white/20 bg-slate-900/60 px-4 py-3 text-sm text-slate-300">
                   <p className="font-medium text-slate-100">Quick test profiles</p>
                   <p className="mt-1">
                     Try usernames like <span className="font-mono text-sky-300">torvalds</span>,{" "}
@@ -227,15 +227,15 @@ export default function HomePage() {
 
             <Card className="border-white/20 bg-slate-900/70 shadow-xl shadow-slate-950/60">
               <CardHeader>
-                <CardTitle className="text-sm font-semibold text-slate-50">
-                  New: PDF portfolio report export
+                <CardTitle className="text-base font-semibold text-slate-50">
+                  PDF portfolio report export
                 </CardTitle>
-                <CardDescription className="text-[11px] text-slate-300">
+                <CardDescription className="text-sm text-slate-300">
                   Download a print-ready report after analysis for applications, mentor reviews, and
                   progress tracking.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2 text-[11px] text-slate-300">
+              <CardContent className="space-y-3 text-sm text-slate-300">
                 <p>The PDF includes:</p>
                 <ul className="list-disc space-y-1 pl-4">
                   <li>Candidate snapshot and full score breakdown.</li>

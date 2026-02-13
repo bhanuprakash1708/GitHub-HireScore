@@ -110,6 +110,35 @@ function BarChart2Icon() {
   );
 }
 
+function InsightBridgeIcon({ suffix }: { suffix: string }) {
+  const topId = `cubeTop-${suffix}`;
+  const leftId = `cubeLeft-${suffix}`;
+  const rightId = `cubeRight-${suffix}`;
+
+  return (
+    <svg viewBox="0 0 48 48" className="h-14 w-14" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id={topId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#a5f3fc" />
+          <stop offset="100%" stopColor="#67e8f9" />
+        </linearGradient>
+        <linearGradient id={leftId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0f172a" />
+          <stop offset="100%" stopColor="#1e293b" />
+        </linearGradient>
+        <linearGradient id={rightId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#334155" />
+          <stop offset="100%" stopColor="#0f172a" />
+        </linearGradient>
+      </defs>
+      <path d="M24 6l14 8-14 8-14-8 14-8z" fill={`url(#${topId})`} />
+      <path d="M10 14l14 8v20L10 34V14z" fill={`url(#${leftId})`} />
+      <path d="M38 14l-14 8v20l14-8V14z" fill={`url(#${rightId})`} />
+      <path d="M24 22v20" stroke="#22d3ee" strokeWidth="1.6" strokeDasharray="2 2" />
+    </svg>
+  );
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -534,35 +563,88 @@ function AnalyzePageContent() {
             </section>
 
             {/* AI feedback */}
-            <section className="grid gap-4 md:grid-cols-[1.1fr,1.1fr]">
-              <Card className="border-white/20 bg-slate-950/80">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-slate-50">
-                    <IconoirSummaryIcon />
-                    <span>Recruiter-style summary</span>
-                  </CardTitle>
-                  <CardDescription className="text-slate-400">
-                    How this GitHub portfolio is likely to land with an engineering-focused recruiter.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <p className="text-slate-200">
-                    {data.aiFeedback.summary ||
-                      "AI feedback was unavailable. Use the numeric score and breakdown to infer strengths and gaps."}
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
-                      Documentation: {data.score.breakdown.documentation.toFixed(1)} / 20
-                    </span>
-                    <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
-                      Activity: {data.score.breakdown.activity.toFixed(1)} / 20
-                    </span>
-                    <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
-                      Technical depth: {data.score.breakdown.technicalDepth.toFixed(1)} / 15
-                    </span>
+            <section className="grid items-start gap-4 md:grid-cols-[1.1fr,1.1fr]">
+              <div className="grid gap-4">
+                <Card className="h-fit self-start border-white/20 bg-slate-950/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-slate-50">
+                      <IconoirSummaryIcon />
+                      <span>Recruiter-style summary</span>
+                    </CardTitle>
+                    <CardDescription className="text-slate-400">
+                      How this GitHub portfolio is likely to land with an engineering-focused recruiter.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                    <p className="text-slate-200">
+                      {data.aiFeedback.summary ||
+                        "AI feedback was unavailable. Use the numeric score and breakdown to infer strengths and gaps."}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
+                        Documentation: {data.score.breakdown.documentation.toFixed(1)} / 20
+                      </span>
+                      <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
+                        Activity: {data.score.breakdown.activity.toFixed(1)} / 20
+                      </span>
+                      <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
+                        Technical depth: {data.score.breakdown.technicalDepth.toFixed(1)} / 15
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid gap-3">
+                  <div className="relative flex items-center rounded-2xl border border-white/20 bg-slate-900/50 px-5 py-3 shadow-xl shadow-slate-950/60">
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/10 via-sky-500/5 to-transparent" />
+                    <div className="relative flex items-center gap-3">
+                      <InsightBridgeIcon suffix="a" />
+                      <div className="text-left">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                          From Insight
+                        </p>
+                        <p className="text-xs text-slate-400">Capture recruiter-facing signals.</p>
+                      </div>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="relative flex items-center rounded-2xl border border-white/20 bg-slate-900/50 px-5 py-3 shadow-xl shadow-slate-950/60">
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/10 via-sky-500/5 to-transparent" />
+                    <div className="relative flex items-center gap-3">
+                      <InsightBridgeIcon suffix="b" />
+                      <div className="text-left">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                          To Strategy
+                        </p>
+                        <p className="text-xs text-slate-400">Highlight where portfolio impact is weakest.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative flex items-center rounded-2xl border border-white/20 bg-slate-900/50 px-5 py-3 shadow-xl shadow-slate-950/60">
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/10 via-sky-500/5 to-transparent" />
+                    <div className="relative flex items-center gap-3">
+                      <InsightBridgeIcon suffix="c" />
+                      <div className="text-left">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                          To Execution
+                        </p>
+                        <p className="text-xs text-slate-400">Convert insights into a concrete action plan.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative flex items-center rounded-2xl border border-white/20 bg-slate-900/50 px-5 py-3 shadow-xl shadow-slate-950/60">
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/10 via-sky-500/5 to-transparent" />
+                    <div className="relative flex items-center gap-3">
+                      <InsightBridgeIcon suffix="d" />
+                      <div className="text-left">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                          Portfolio Proof
+                        </p>
+                        <p className="text-xs text-slate-400">Package outcomes into recruiter-ready evidence.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div className="grid gap-4">
                 <Card className="border-white/20 bg-slate-950/80">
