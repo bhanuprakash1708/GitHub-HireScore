@@ -2,7 +2,9 @@
 
 Turn your GitHub profile into recruiter‑ready, data‑backed proof.
 
-Built for the **UnsaidTalks Hackathon**.
+## Demo Video
+
+Watch the demo here: [Project Demo Video](https://drive.google.com/file/d/1CI5uujaKSkNJlSgObNZJ2-FqqGhJjWn8/view?usp=sharing)
 
 ---
 
