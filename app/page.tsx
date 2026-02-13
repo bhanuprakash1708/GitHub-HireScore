@@ -224,6 +224,26 @@ export default function HomePage() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card className="border-white/20 bg-slate-900/70 shadow-xl shadow-slate-950/60">
+              <CardHeader>
+                <CardTitle className="text-sm font-semibold text-slate-50">
+                  New: PDF portfolio report export
+                </CardTitle>
+                <CardDescription className="text-[11px] text-slate-300">
+                  Download a print-ready report after analysis for applications, mentor reviews, and
+                  progress tracking.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2 text-[11px] text-slate-300">
+                <p>The PDF includes:</p>
+                <ul className="list-disc space-y-1 pl-4">
+                  <li>Candidate snapshot and full score breakdown.</li>
+                  <li>Recruiter-style summary, strengths, red flags, and 90-day action plan.</li>
+                  <li>Repository table with stars, updates, README status, and commit activity.</li>
+                </ul>
+              </CardContent>
+            </Card>
           </section>
         </div>
       </main>
