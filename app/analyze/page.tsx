@@ -1,0 +1,629 @@
+﻿"use client";
+
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip
+} from "recharts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScoreRing } from "@/components/score-ring";
+import { AiFeedback, PortfolioScore, PortfolioMetrics } from "@/types/github";
+
+interface AnalyzeResponse {
+  metrics: PortfolioMetrics;
+  score: PortfolioScore;
+  aiFeedback: AiFeedback;
+}
+
+function HeroStrengthIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-emerald-300" fill="none" aria-hidden="true">
+      <path
+        d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+      <path d="M9.2 12.2l1.8 1.8 3.8-3.8" stroke="currentColor" strokeWidth="1.9" />
+    </svg>
+  );
+}
+
+function RemixRedFlagIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-rose-300" fill="none" aria-hidden="true">
+      <path d="M12 4l8 14H4l8-14z" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 9v4" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="16" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function TablerPlanIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-cyan-300" fill="none" aria-hidden="true">
+      <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8 3v4M16 3v4M4 9h16M9 14l2 2 4-4" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function FeatherRepoIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-sky-300" fill="none" aria-hidden="true">
+      <path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function TablerRadarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-cyan-300" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="12" cy="12" r="4.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M12 12l6-3" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="18" cy="9" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function IconoirSummaryIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-violet-300" fill="none" aria-hidden="true">
+      <path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6A2.5 2.5 0 0 1 16.5 15H10l-4 4v-4.5A2.5 2.5 0 0 1 5 12V6.5z" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M9 8.5h6M9 11h4" stroke="currentColor" strokeWidth="1.7" />
+    </svg>
+  );
+}
+
+function UserCircleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-sky-300" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M7.8 16.6c1.1-1.9 2.6-2.8 4.2-2.8s3.1.9 4.2 2.8" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function BarChart2Icon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-emerald-300" fill="none" aria-hidden="true">
+      <path d="M4 19h16" stroke="currentColor" strokeWidth="1.8" />
+      <rect x="6" y="11" width="3" height="6" rx="1" stroke="currentColor" strokeWidth="1.8" />
+      <rect x="11" y="8" width="3" height="9" rx="1" stroke="currentColor" strokeWidth="1.8" />
+      <rect x="16" y="5" width="3" height="12" rx="1" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function AnalyzePageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const username = searchParams.get("username") ?? "";
+
+  const [data, setData] = useState<AnalyzeResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!username) return;
+    const controller = new AbortController();
+
+    async function runAnalysis() {
+      try {
+        setIsLoading(true);
+        setError(null);
+        console.log("[client] Triggering analysis for", username);
+        const res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+          signal: controller.signal
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          setError(body.error ?? "Failed to analyze profile.");
+          setIsLoading(false);
+          return;
+        }
+        const json = (await res.json()) as AnalyzeResponse;
+        setData(json);
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        console.error("[client] Analysis error", err);
+        setError("Unexpected error while analyzing this profile.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    runAnalysis();
+    return () => controller.abort();
+  }, [username]);
+
+  const radarData = useMemo(() => {
+    if (!data) return [];
+    const b = data.score.breakdown;
+    return [
+      { metric: "Documentation", score: b.documentation },
+      { metric: "Code structure", score: b.codeStructure },
+      { metric: "Activity", score: b.activity },
+      { metric: "Technical depth", score: b.technicalDepth },
+      { metric: "Impact", score: b.impact },
+      { metric: "Organization", score: b.organization }
+    ];
+  }, [data]);
+
+  const barData = radarData;
+
+  const bandBadgeVariant =
+    data?.score.band === "Recruiter Ready"
+      ? "success"
+      : data?.score.band === "Strong but Improvable"
+      ? "default"
+      : data?.score.band === "Needs Optimization"
+      ? "outline"
+      : "destructive";
+
+  if (!username) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4">
+        <Card className="max-w-md border-white/20 bg-slate-900 text-slate-100">
+          <CardHeader>
+            <CardTitle className="text-slate-100">Missing username</CardTitle>
+            <CardDescription className="text-slate-400">
+              Go back to the landing page and paste a GitHub profile URL or username to start.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push("/")}>Back to home</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-50">
+      <header className="sticky top-0 z-20 border-b border-white/20 bg-slate-950/90 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/")}
+              className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-xs font-semibold text-slate-900 shadow-sm shadow-slate-900/40"
+            >
+              GP
+            </button>
+            <div>
+              <p className="text-sm font-semibold text-slate-50">
+                GitHub Portfolio Report{" "}
+                <span className="font-normal text-slate-400">for @{username}</span>
+              </p>
+              <p className="text-[11px] text-slate-400">
+                Live recruiter-style read on your GitHub footprint.
+              </p>
+            </div>
+          </div>
+          <div className="hidden items-center gap-2 sm:flex">
+            {data?.score && (
+              <Badge variant={bandBadgeVariant}>
+                {data.score.band} - {data.score.total}/100
+              </Badge>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        {isLoading && !data ? (
+          <div className="space-y-4">
+            <Skeleton className="h-24 rounded-lg bg-slate-800/60" />
+            <div className="grid gap-4 md:grid-cols-[1.2fr,1fr]">
+              <Skeleton className="h-64 rounded-lg bg-slate-800/60" />
+              <Skeleton className="h-64 rounded-lg bg-slate-800/60" />
+            </div>
+            <Skeleton className="h-56 rounded-lg bg-slate-800/60" />
+            <Skeleton className="h-40 rounded-lg bg-slate-800/60" />
+          </div>
+        ) : error ? (
+          <Card className="border-white/20 bg-slate-950/80">
+            <CardHeader>
+              <CardTitle className="text-slate-50">We couldn&apos;t analyze this profile</CardTitle>
+              <CardDescription className="text-slate-400">{error}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap items-center gap-3">
+              <Button
+                onClick={() => router.push("/")}
+                className="bg-sky-500 text-slate-950 hover:bg-sky-400"
+              >
+                Try another profile
+              </Button>
+              <p className="text-xs text-slate-400">
+                Check that the profile is public and the username is spelled correctly. We only use
+                public GitHub data.
+              </p>
+            </CardContent>
+          </Card>
+        ) : data ? (
+          <div className="space-y-8">
+            <section className="space-y-1">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                Portfolio insights
+              </p>
+              <h1 className="text-xl font-semibold text-slate-50 sm:text-2xl">
+                Recruiter-style view of @{data.metrics.user.login}
+              </h1>
+              <p className="text-sm text-slate-400">
+                We analyzed public repositories, documentation, and activity to produce this score
+                and report. Use it as a starting point to level up your GitHub footprint.
+              </p>
+            </section>
+
+            {/* Top summary row */}
+            <section className="grid gap-4 md:grid-cols-[1.2fr,1fr]">
+              <Card className="border-white/20 bg-slate-950/80">
+                <CardHeader className="flex flex-row items-center justify-between border-b border-white/20">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-slate-50">
+                      <UserCircleIcon />
+                      <span>Candidate snapshot</span>
+                    </CardTitle>
+                    <CardDescription className="text-slate-400">
+                      Quick recruiter view of @{data.metrics.user.login}&apos;s GitHub presence.
+                    </CardDescription>
+                  </div>
+                  <Badge variant={bandBadgeVariant}>{data.score.band}</Badge>
+                </CardHeader>
+                <CardContent className="flex flex-wrap items-center gap-4">
+                  <img
+                    src={data.metrics.user.avatar_url}
+                    alt={data.metrics.user.login}
+                    className="h-16 w-16 rounded-full border border-slate-700 object-cover"
+                  />
+                  <div className="space-y-1 text-sm">
+                    <p className="font-semibold text-slate-50">
+                      {data.metrics.user.name ?? data.metrics.user.login}
+                    </p>
+                    <a
+                      href={data.metrics.user.html_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-sky-300 underline underline-offset-2"
+                    >
+                      {data.metrics.user.html_url}
+                    </a>
+                    {data.metrics.user.bio && (
+                      <p className="text-xs text-slate-300">
+                        {data.metrics.user.bio}
+                      </p>
+                    )}
+                    <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-400">
+                      <span>Followers: {data.metrics.user.followers}</span>
+                      <span>Public repos: {data.metrics.user.public_repos}</span>
+                      <span>Analyzed repos: {data.metrics.repos.length}</span>
+                      <span>Commits (last 90d): {data.metrics.totalCommits90d}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="flex items-center justify-center border-white/20 bg-slate-950/80">
+                <CardContent className="flex w-full items-center justify-center py-6">
+                  <ScoreRing score={data.score.total} label={data.score.band} />
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Charts */}
+            <section className="grid gap-4 md:grid-cols-[1.1fr,1.1fr]">
+              <Card className="border-white/20 bg-slate-950/80">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-slate-50">
+                    <TablerRadarIcon />
+                    <span>Score radar</span>
+                  </CardTitle>
+                  <CardDescription className="text-slate-400">
+                    How balanced this portfolio is across key hiring dimensions.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart data={radarData}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="metric" />
+                      <PolarRadiusAxis angle={30} domain={[0, 20]} />
+                      <Radar
+                        name="Score"
+                        dataKey="score"
+                        stroke="#22d3ee"
+                        fill="#22d3ee"
+                        fillOpacity={0.4}
+                      />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card className="border-white/20 bg-slate-950/80">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-slate-50">
+                    <BarChart2Icon />
+                    <span>Score breakdown</span>
+                  </CardTitle>
+                  <CardDescription className="text-slate-400">
+                    0-20 for most dimensions, 0-15 for technical depth & impact, 0-10 for
+                    organization.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barData} margin={{ top: 16, right: 16, left: -20, bottom: 4 }}>
+                      <XAxis
+                        dataKey="metric"
+                        tick={{ fontSize: 11 }}
+                        interval={0}
+                      />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="score" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* AI feedback */}
+            <section className="grid gap-4 md:grid-cols-[1.1fr,1.1fr]">
+              <Card className="border-white/20 bg-slate-950/80">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-slate-50">
+                    <IconoirSummaryIcon />
+                    <span>Recruiter-style summary</span>
+                  </CardTitle>
+                  <CardDescription className="text-slate-400">
+                    How this GitHub portfolio is likely to land with an engineering-focused recruiter.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                  <p className="text-slate-200">
+                    {data.aiFeedback.summary ||
+                      "AI feedback was unavailable. Use the numeric score and breakdown to infer strengths and gaps."}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
+                      Documentation: {data.score.breakdown.documentation.toFixed(1)} / 20
+                    </span>
+                    <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
+                      Activity: {data.score.breakdown.activity.toFixed(1)} / 20
+                    </span>
+                    <span className="rounded-md border border-white/20 bg-slate-900/70 px-2.5 py-1 font-medium text-slate-200">
+                      Technical depth: {data.score.breakdown.technicalDepth.toFixed(1)} / 15
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid gap-4">
+                <Card className="border-white/20 bg-slate-950/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-slate-50">
+                      <HeroStrengthIcon />
+                      <span>Strengths</span>
+                    </CardTitle>
+                    <CardDescription className="text-slate-400">
+                      Signals that work in your favor when a recruiter scans your GitHub.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="list-disc space-y-1 pl-4 text-sm">
+                      {data.aiFeedback.strengths.length > 0 ? (
+                        data.aiFeedback.strengths.map((s, i) => <li key={i}>{s}</li>)
+                      ) : (
+                        <li className="text-slate-400">
+                          AI strengths are unavailable. Look at the highest-scoring dimensions as
+                          your current portfolio strengths.
+                        </li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+                <Card className="border-white/20 bg-slate-950/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-slate-50">
+                      <RemixRedFlagIcon />
+                      <span>Red flags</span>
+                    </CardTitle>
+                    <CardDescription className="text-slate-400">
+                      Areas that may raise questions or hesitation for a hiring manager.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="list-disc space-y-1 pl-4 text-sm">
+                      {data.aiFeedback.redFlags.length > 0 ? (
+                        data.aiFeedback.redFlags.map((s, i) => <li key={i}>{s}</li>)
+                      ) : (
+                        <li className="text-slate-400">
+                          AI red flags are unavailable. Look at the lowest-scoring dimensions as
+                          your main risk areas.
+                        </li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+
+            {/* Action plan & repo table */}
+            <section className="grid gap-4 md:grid-cols-[1.2fr,1.4fr]">
+              <Card className="border-white/20 bg-slate-950/80">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-slate-50">
+                    <TablerPlanIcon />
+                    <span>90-day action plan</span>
+                  </CardTitle>
+                  <CardDescription className="text-slate-400">
+                    High-leverage improvements you can realistically ship in days, not months.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ol className="space-y-2 text-sm">
+                    {data.aiFeedback.actionItems.length > 0 ? (
+                      data.aiFeedback.actionItems.map((item, i) => (
+                        <li key={i} className="flex gap-2">
+                          <span className="mt-1 h-5 w-5 flex-shrink-0 rounded-full border border-slate-700 text-center text-[10px] font-semibold leading-5 text-slate-200">
+                            {i + 1}
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <>
+                        <li className="flex gap-2">
+                          <span className="mt-1 h-5 w-5 flex-shrink-0 rounded-full border border-slate-700 text-center text-[10px] font-semibold leading-5 text-slate-200">
+                            1
+                          </span>
+                          <span>
+                            Pick your top 2-3 flagship repositories and ensure they have strong
+                            READMEs with Installation, Usage, and clear positioning (who is this
+                            for, what problem it solves).
+                          </span>
+                        </li>
+                        <li className="flex gap-2">
+                          <span className="mt-1 h-5 w-5 flex-shrink-0 rounded-full border border-slate-700 text-center text-[10px] font-semibold leading-5 text-slate-200">
+                            2
+                          </span>
+                          <span>
+                            Aim for at least 2-3 meaningful commits per week on one flagship repo
+                            for the next 90 days to show consistency.
+                          </span>
+                        </li>
+                        <li className="flex gap-2">
+                          <span className="mt-1 h-5 w-5 flex-shrink-0 rounded-full border border-slate-700 text-center text-[10px] font-semibold leading-5 text-slate-200">
+                            3
+                          </span>
+                          <span>
+                            Archive or clean up old toy projects so your profile highlights only
+                            work you&apos;d be happy to discuss in an interview.
+                          </span>
+                        </li>
+                      </>
+                    )}
+                  </ol>
+                </CardContent>
+              </Card>
+
+              <Card className="border-white/20 bg-slate-950/80">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-slate-50">
+                    <FeatherRepoIcon />
+                    <span>Repository portfolio</span>
+                  </CardTitle>
+                  <CardDescription className="text-slate-400">
+                    Surface-level health of your public projects - documentation, activity, and
+                    signals recruiters notice.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="max-h-80 overflow-auto rounded-md border border-white/20 bg-slate-950/80">
+                    <Table>
+                      <Thead>
+                        <Tr>
+                          <Th>Repository</Th>
+                          <Th>Stars</Th>
+                          <Th>Last updated</Th>
+                          <Th>README</Th>
+                          <Th>Commits 90d</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {data.metrics.repos.map((r) => (
+                          <Tr key={r.repo.id}>
+                            <Td className="max-w-[220px]">
+                              <a
+                                href={r.repo.html_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="truncate text-xs font-medium text-sky-300 underline underline-offset-2"
+                              >
+                                {r.repo.name}
+                              </a>
+                              {r.repo.description && (
+                                <p className="mt-0.5 line-clamp-2 text-[11px] text-slate-400">
+                                  {r.repo.description}
+                                </p>
+                              )}
+                            </Td>
+                            <Td className="text-xs">{r.repo.stargazers_count}</Td>
+                            <Td className="text-xs">
+                              {new Date(r.repo.updated_at).toLocaleDateString()}
+                            </Td>
+                            <Td className="text-xs">
+                              {r.readmePresent ? (
+                                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                                  Present
+                                </span>
+                              ) : (
+                                <span className="rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-600">
+                                  Missing
+                                </span>
+                              )}
+                            </Td>
+                            <Td className="text-xs">{r.commitCount90d}</Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Tip: For any repo that matters to your story, make sure it has a clear README
+                    and recent commits - that&apos;s what most hiring teams look at first.
+                  </p>
+                </CardContent>
+              </Card>
+            </section>
+          </div>
+        ) : null}
+      </main>
+    </div>
+  );
+}
+
+export default function AnalyzePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+          <main className="mx-auto max-w-6xl px-4 py-6">
+            <div className="space-y-4">
+              <Skeleton className="h-24 rounded-lg bg-slate-800/60" />
+              <div className="grid gap-4 md:grid-cols-[1.2fr,1fr]">
+                <Skeleton className="h-64 rounded-lg bg-slate-800/60" />
+                <Skeleton className="h-64 rounded-lg bg-slate-800/60" />
+              </div>
+              <Skeleton className="h-56 rounded-lg bg-slate-800/60" />
+              <Skeleton className="h-40 rounded-lg bg-slate-800/60" />
+            </div>
+          </main>
+        </div>
+      }
+    >
+      <AnalyzePageContent />
+    </Suspense>
+  );
+}
+
+
