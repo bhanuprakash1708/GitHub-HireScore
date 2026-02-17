@@ -56,9 +56,9 @@ export default function HomePage() {
               <p className="text-sm font-semibold">
                 GitHub Portfolio Analyzer
               </p>
-              <p className="text-[11px] text-slate-400">
+              {/* <p className="text-[11px] text-slate-400">
                 Built for UnsaidTalks - Recruiter-style GitHub intelligence
-              </p>
+              </p> */}
             </div>
           </div>
           <div className="hidden items-center gap-2 sm:flex">
